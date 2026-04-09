@@ -154,6 +154,10 @@ The application will be available at **http://localhost:8001/login**.
 
 This populates the local database with demo products, variants, attributes, channels, and placeholder product imagery used in the README screenshots.
 
+### Release Zip
+
+GitHub Releases can attach a product-only zip bundle built by CI. The release package excludes repository engineering files such as `.git`, tests, and local tooling, and includes a seeded `erp_pim.db` so first-time users immediately see demo products and channels after launch.
+
 ### Environment Variables
 
 | Variable | Default | Description |
