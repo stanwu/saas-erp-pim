@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Connect Channel — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Connect {{ channel.name }}</h4>
+  <a href="/channels" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>{{ guide.title }}</span>
+        <span class="badge bg-{{ status_badge(channel.setup_status) }}">{{ channel.setup_status.replace('_', ' ') }}</span>
+      </div>
+      <div class="card-body">
+        <p class="mb-3">{{ guide.summary }}</p>
+        <ol class="small">
+          {% for step in guide.steps %}
+          <li class="mb-2">{{ step }}</li>
+          {% endfor %}
+        </ol>
+        <div class="border rounded p-3 bg-light small mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <div class="fw-semibold">Recommended callback URL</div>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              data-copy-text="{{ guide.callback_url }}"
+              data-copy-label="callback-copy-feedback"
+            >
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </div>
+          <div class="text-break" id="callback-copy-text">{{ guide.callback_url }}</div>
+          <div class="text-success mt-2 d-none" id="callback-copy-feedback">Copied.</div>
+        </div>
+        {% if channel.help_url %}
+        <a href="{{ channel.help_url }}" target="_blank" rel="noreferrer" class="btn btn-sm btn-outline-primary">Open Official Guide</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header">Connection Details</div>
+      <div class="card-body">
+        <form method="post" action="/channels/{{ channel.id }}/connect">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Friendly Store Name</label>
+              <input type="text" name="account_label" class="form-control" value="{{ channel.account_label or '' }}" placeholder="My main shop">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ guide.store_url_label or "Store URL" }}</label>
+              <input type="url" name="store_url" class="form-control" value="{{ channel.store_url or '' }}" placeholder="{{ guide.store_url_example or 'https://example.com' }}">
+              <div class="form-text">Example: {{ guide.store_url_example or "https://example.com" }}</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Requested Permissions / Scopes</label>
+              <input type="text" name="requested_scopes" class="form-control" value="{{ channel.requested_scopes or '' }}" placeholder="read_products,write_products">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">{{ guide.api_key_label or "API Key / Consumer Key" }}</label>
+              <input type="text" name="api_key" class="form-control" value="{{ channel.api_key or '' }}" placeholder="{{ guide.api_key_label or 'Paste key if this platform uses one' }}">
+              {% if guide.api_key_help %}
+              <div class="form-text">{{ guide.api_key_help }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ guide.api_secret_label or "API Secret / Consumer Secret" }}</label>
+              <input type="password" name="api_secret" class="form-control" value="{{ channel.api_secret or '' }}" placeholder="{{ guide.api_secret_label or 'Paste secret if this platform uses one' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Access Token</label>
+              <textarea name="access_token" class="form-control" rows="2" placeholder="Paste access token if already issued">{{ channel.access_token or '' }}</textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Refresh Token</label>
+              <textarea name="refresh_token" class="form-control" rows="2" placeholder="Paste refresh token if the platform provides one">{{ channel.refresh_token or '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">{{ guide.client_id_label or "Client ID / App ID" }}</label>
+              <input type="text" name="client_id" class="form-control" value="{{ channel.client_id or '' }}" placeholder="{{ guide.client_id_label or 'Needed for OAuth-style setup' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ guide.client_secret_label or "Client Secret" }}</label>
+              <input type="password" name="client_secret" class="form-control" value="{{ channel.client_secret or '' }}" placeholder="{{ guide.client_secret_label or 'Needed for OAuth-style setup' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">OAuth Redirect URI</label>
+              <input type="url" name="oauth_redirect_uri" class="form-control" value="{{ channel.oauth_redirect_uri or guide.callback_url }}">
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+              <button type="submit" class="btn btn-primary">Save Connection Details</button>
+              {% if channel.help_url %}
+              <a href="{{ channel.help_url }}" target="_blank" rel="noreferrer" class="btn btn-outline-secondary">Open Help</a>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">OAuth Return Box</div>
+      <div class="card-body">
+        <p class="small text-muted">If the platform redirects back to this app, any returned authorization code will be stored here so the operator does not need to understand query parameters.</p>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Preferred method</dt>
+          <dd class="col-sm-8">{{ channel.preferred_auth_method }}</dd>
+          <dt class="col-sm-4">Last OAuth code</dt>
+          <dd class="col-sm-8 text-break">{{ channel.last_oauth_code or "Not received yet" }}</dd>
+          <dt class="col-sm-4">Last error</dt>
+          <dd class="col-sm-8 text-break">{{ channel.last_connection_error or "None" }}</dd>
+          <dt class="col-sm-4">Connected at</dt>
+          <dd class="col-sm-8">{{ channel.connected_at.strftime("%Y-%m-%d %H:%M") if channel.connected_at else "Not marked ready yet" }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.querySelectorAll("[data-copy-text]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const text = button.getAttribute("data-copy-text") || "";
+      const feedbackId = button.getAttribute("data-copy-label");
+      const feedback = feedbackId ? document.getElementById(feedbackId) : null;
+      try {
+        await navigator.clipboard.writeText(text);
+        if (feedback) {
+          feedback.textContent = "Copied to clipboard.";
+          feedback.classList.remove("d-none");
+          feedback.classList.remove("text-danger");
+          feedback.classList.add("text-success");
+          window.setTimeout(() => feedback.classList.add("d-none"), 1800);
+        }
+      } catch (error) {
+        if (feedback) {
+          feedback.textContent = "Copy failed. Please copy manually.";
+          feedback.classList.remove("d-none");
+          feedback.classList.remove("text-success");
+          feedback.classList.add("text-danger");
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

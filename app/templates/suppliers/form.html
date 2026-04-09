@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{% if supplier %}Edit Supplier{% else %}New Supplier{% endif %} — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{% if supplier %}Edit Supplier{% else %}New Supplier{% endif %}</h4>
+  <a href="/suppliers" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <form method="post" action="{% if supplier %}/suppliers/{{ supplier.id }}/edit{% else %}/suppliers/new{% endif %}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Name <span class="text-danger">*</span></label>
+          <input type="text" name="name" class="form-control" value="{{ supplier.name if supplier else '' }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Contact Person</label>
+          <input type="text" name="contact_person" class="form-control" value="{{ supplier.contact_person if supplier else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" value="{{ supplier.email if supplier else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone</label>
+          <input type="text" name="phone" class="form-control" value="{{ supplier.phone if supplier else '' }}">
+        </div>
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="on" {% if (supplier and supplier.is_active) or not supplier %}checked{% endif %}>
+            <label class="form-check-label" for="is_active">Active</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">{% if supplier %}Save Changes{% else %}Create Supplier{% endif %}</button>
+          <a href="/suppliers" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

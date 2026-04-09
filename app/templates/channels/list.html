@@ -1,0 +1,43 @@
+{% from "partials/pagination.html" import render_pagination %}
+{% extends "base.html" %}
+{% block title %}Channels — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Channels <span class="badge bg-secondary fs-6">{{ total }}</span></h4>
+</div>
+
+<form method="get" class="mb-3">
+  <div class="input-group input-group-sm" style="max-width:400px">
+    <input type="text" name="q" class="form-control" placeholder="Search channel name…" value="{{ q }}">
+    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+    {% if q %}<a href="/channels" class="btn btn-outline-danger">✕</a>{% endif %}
+  </div>
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm mb-0">
+      <thead class="table-light"><tr><th>Name</th><th>Type</th><th>Connection</th><th>Base URL</th><th></th></tr></thead>
+      <tbody>
+        {% for channel in channels %}
+        <tr>
+          <td>{{ channel.name }}</td>
+          <td><span class="badge bg-secondary">{{ channel.channel_type.value }}</span></td>
+          <td>
+            <span class="badge bg-{{ status_badge(channel.setup_status) }}">{{ channel.setup_status.replace('_', ' ') }}</span>
+            {% if channel.account_label %}<div class="small text-muted mt-1">{{ channel.account_label }}</div>{% endif %}
+          </td>
+          <td class="small">{% if channel.base_url %}<a href="{{ channel.base_url }}" target="_blank" rel="noreferrer">{{ channel.base_url }}</a>{% else %}—{% endif %}</td>
+          <td class="text-end">
+            <a href="/channels/{{ channel.id }}/connect" class="btn btn-sm btn-outline-secondary py-0 px-1">{% if channel.setup_status == "not_connected" %}Connect{% else %}Manage{% endif %}</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No channels found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{ render_pagination(page, total_pages, "/channels", "&q=" + q if q else "") }}
+{% endblock %}

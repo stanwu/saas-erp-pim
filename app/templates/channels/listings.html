@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Channel Listings — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Channel Listings: {{ product.name }}</h4>
+  <a href="/products/{{ product.id }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">Add Listing</div>
+  <div class="card-body">
+    <form method="post" action="/channels/{{ product.id }}/listings/new">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Channel</label>
+          <select name="channel_id" class="form-select" required>
+            <option value="">— Select Channel —</option>
+            {% for channel in channels %}
+            <option value="{{ channel.id }}">{{ channel.name }} ({{ channel.setup_status.replace('_', ' ') }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">External Product ID</label>
+          <input type="text" name="external_product_id" class="form-control">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">External URL</label>
+          <input type="url" name="external_url" class="form-control">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <select name="listing_status" class="form-select">
+            {% for status in statuses %}
+            <option value="{{ status.value }}">{{ status.value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Price Override</label>
+          <input type="number" step="0.01" name="price_override" class="form-control">
+        </div>
+        <div class="col-md-4">
+          <div class="form-check mt-4 pt-2">
+            <input class="form-check-input" type="checkbox" name="sync_enabled" id="sync_enabled" value="on" checked>
+            <label class="form-check-label" for="sync_enabled">Sync enabled</label>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Title Override</label>
+          <input type="text" name="title_override" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Description Override</label>
+          <textarea name="description_override" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Create Listing</button>
+        </div>
+        {% if not channels %}
+        <div class="col-12 text-muted">No connected channels yet. Go to Channels and complete the connection setup first.</div>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3">
+  {% for listing in product.channel_listings %}
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">{{ listing.channel.name if listing.channel else listing.channel_id }}</div>
+      <div class="card-body">
+        <form method="post" action="/channels/listings/{{ listing.id }}/edit">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">External Product ID</label>
+              <input type="text" name="external_product_id" class="form-control form-control-sm" value="{{ listing.external_product_id or '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">External URL</label>
+              <input type="url" name="external_url" class="form-control form-control-sm" value="{{ listing.external_url or '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Status</label>
+              <select name="listing_status" class="form-select form-select-sm">
+                {% for status in statuses %}
+                <option value="{{ status.value }}" {% if listing.listing_status == status %}selected{% endif %}>{{ status.value }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Price Override</label>
+              <input type="number" step="0.01" name="price_override" class="form-control form-control-sm" value="{{ listing.price_override if listing.price_override is not none else '' }}">
+            </div>
+            <div class="col-md-4">
+              <div class="form-check mt-4 pt-2">
+                <input class="form-check-input" type="checkbox" name="sync_enabled" id="sync_{{ listing.id }}" value="on" {% if listing.sync_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="sync_{{ listing.id }}">Sync enabled</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Title Override</label>
+              <input type="text" name="title_override" class="form-control form-control-sm" value="{{ listing.title_override or '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description Override</label>
+              <textarea name="description_override" class="form-control form-control-sm" rows="2">{{ listing.description_override or '' }}</textarea>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-sm btn-primary">Save Listing</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12 text-muted">No channel listings yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}

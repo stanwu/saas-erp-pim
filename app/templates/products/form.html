@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}{% if product %}Edit Product{% else %}New Product{% endif %} — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{% if product %}Edit Product{% else %}New Product{% endif %}</h4>
+  <a href="/products" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <form method="post" action="{% if product %}/products/{{ product.id }}/edit{% else %}/products/new{% endif %}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="row g-3">
+        {% if not product %}
+        <div class="col-md-4">
+          <label class="form-label">SKU <span class="text-danger">*</span></label>
+          <input type="text" name="sku" class="form-control" value="" required>
+        </div>
+        {% endif %}
+        <div class="col-md-{% if product %}6{% else %}8{% endif %}">
+          <label class="form-label">Name <span class="text-danger">*</span></label>
+          <input type="text" name="name" class="form-control" value="{{ product.name if product else '' }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Category</label>
+          <select name="category_id" class="form-select">
+            <option value="">— None —</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if product and product.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Brand</label>
+          <select name="brand_id" class="form-select">
+            <option value="">— None —</option>
+            {% for brand in brands %}
+            <option value="{{ brand.id }}" {% if product and product.brand_id == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Supplier</label>
+          <select name="supplier_id" class="form-select">
+            <option value="">— None —</option>
+            {% for supplier in suppliers %}
+            <option value="{{ supplier.id }}" {% if product and product.supplier_id == supplier.id %}selected{% endif %}>{{ supplier.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select">
+            {% for item in statuses %}
+            <option value="{{ item.value }}" {% if (product and product.status == item) or (not product and item.value == "draft") %}selected{% endif %}>{{ item.value }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Unit</label>
+          <input type="text" name="unit" class="form-control" value="{{ product.unit if product else 'pcs' }}" placeholder="pcs / kg / L">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Cost Price</label>
+          <input type="number" name="cost_price" class="form-control" step="0.01" min="0" value="{{ product.cost_price if product else '0' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Sale Price</label>
+          <input type="number" name="sale_price" class="form-control" step="0.01" min="0" value="{{ product.sale_price if product else '0' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Reorder Point</label>
+          <input type="number" name="reorder_point" class="form-control" min="0" value="{{ product.reorder_point if product else '0' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Weight</label>
+          <input type="number" name="weight" class="form-control" step="0.01" min="0" value="{{ product.weight if product else '0' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Length</label>
+          <input type="number" name="length" class="form-control" step="0.01" min="0" value="{{ product.length if product else '0' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Width</label>
+          <input type="number" name="width" class="form-control" step="0.01" min="0" value="{{ product.width if product else '0' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Height</label>
+          <input type="number" name="height" class="form-control" step="0.01" min="0" value="{{ product.height if product else '0' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Short Description</label>
+          <input type="text" name="short_description" class="form-control" value="{{ product.short_description if product and product.short_description else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Barcode</label>
+          <input type="text" name="barcode" class="form-control" value="{{ product.barcode if product and product.barcode else '' }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" rows="3">{{ product.description if product else '' }}</textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">SEO Title</label>
+          <input type="text" name="seo_title" class="form-control" value="{{ product.seo_title if product and product.seo_title else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">SEO Keywords</label>
+          <input type="text" name="seo_keywords" class="form-control" value="{{ product.seo_keywords if product and product.seo_keywords else '' }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">SEO Description</label>
+          <textarea name="seo_description" class="form-control" rows="2">{{ product.seo_description if product and product.seo_description else '' }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Tags</label>
+          <input type="text" name="tag_names" class="form-control" value="{{ selected_tags }}" placeholder="Comma-separated tags">
+        </div>
+        {% if attributes %}
+        <div class="col-12"><hr></div>
+        <div class="col-12">
+          <h5 class="mb-0">Attribute Values</h5>
+        </div>
+        {% for attribute in attributes %}
+        <div class="col-md-6">
+          <label class="form-label">{{ attribute.name }}{% if attribute.unit_label %} ({{ attribute.unit_label }}){% endif %}</label>
+          {% if attribute.attribute_type.value == "select" %}
+          <select name="attribute_{{ attribute.id }}" class="form-select">
+            <option value="">— None —</option>
+            {% for option in attribute.options %}
+            <option value="{{ option.value }}" {% if attribute_values.get(attribute.id, "") == option.value %}selected{% endif %}>{{ option.value }}</option>
+            {% endfor %}
+          </select>
+          {% elif attribute.attribute_type.value == "multiselect" %}
+          <input type="text" name="attribute_{{ attribute.id }}" class="form-control" value="{{ attribute_values.get(attribute.id, '') }}" placeholder="Comma-separated option values">
+          {% elif attribute.attribute_type.value == "boolean" %}
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" name="attribute_{{ attribute.id }}" id="attribute_{{ attribute.id }}" value="true" {% if attribute_values.get(attribute.id, "") == "true" %}checked{% endif %}>
+            <label class="form-check-label" for="attribute_{{ attribute.id }}">Enabled</label>
+          </div>
+          {% else %}
+          <input type="text" name="attribute_{{ attribute.id }}" class="form-control" value="{{ attribute_values.get(attribute.id, '') }}">
+          {% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+        <div class="col-12">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="on" {% if (product and product.is_active) or not product %}checked{% endif %}>
+            <label class="form-check-label" for="is_active">Active</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">{% if product %}Save Changes{% else %}Create Product{% endif %}</button>
+          <a href="/products" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

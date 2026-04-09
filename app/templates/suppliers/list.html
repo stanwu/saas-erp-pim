@@ -1,0 +1,34 @@
+{% from "partials/pagination.html" import render_pagination %}
+{% extends "base.html" %}
+{% block title %}Suppliers — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Suppliers <span class="badge bg-secondary fs-6">{{ total }}</span></h4>
+  <a href="/suppliers/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Supplier</a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm mb-0">
+      <thead class="table-light"><tr><th>Name</th><th>Contact</th><th>Email</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for supplier in suppliers %}
+        <tr>
+          <td>{{ supplier.name }}</td>
+          <td class="small">{{ supplier.contact_person or "—" }}</td>
+          <td class="small">{{ supplier.email or "—" }}</td>
+          <td class="small">{{ supplier.phone or "—" }}</td>
+          <td>{% if supplier.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+          <td class="text-end">
+            <a href="/suppliers/{{ supplier.id }}/edit" class="btn btn-sm btn-outline-secondary py-0 px-1">Edit</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No suppliers found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{ render_pagination(page, total_pages, "/suppliers", "&q=" + q if q else "") }}
+{% endblock %}

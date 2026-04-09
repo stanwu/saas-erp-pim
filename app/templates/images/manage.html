@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Manage Images — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Manage Images: {{ product.name }}</h4>
+  <a href="/products/{{ product.id }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">Upload Image</div>
+  <div class="card-body">
+    <form method="post" action="/images/products/{{ product.id }}/upload" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Image File</label>
+          <input type="file" name="image_file" class="form-control" accept="image/*" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Variant</label>
+          <select name="variant_id" class="form-select">
+            <option value="">— Product Level —</option>
+            {% for variant in product.variants %}
+            <option value="{{ variant.id }}">{{ variant.name }} ({{ variant.sku }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Alt Text</label>
+          <input type="text" name="alt_text" class="form-control">
+        </div>
+        <div class="col-md-4">
+          <div class="form-check mt-4 pt-2">
+            <input class="form-check-input" type="checkbox" name="is_primary" id="is_primary" value="on">
+            <label class="form-check-label" for="is_primary">Set as primary image</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Existing Images</div>
+  <div class="card-body">
+    <div class="row g-3">
+      {% for image in product.images | sort(attribute='sort_order') %}
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="row g-0">
+            <div class="col-md-4">
+              <img src="{{ image.path }}" alt="{{ image.alt_text or product.name }}" class="img-fluid rounded-start h-100 object-fit-cover">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <form method="post" action="/images/{{ image.id }}/edit" class="mb-3">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                  <div class="row g-2">
+                    <div class="col-12">
+                      <label class="form-label">Alt Text</label>
+                      <input type="text" name="alt_text" class="form-control form-control-sm" value="{{ image.alt_text or '' }}">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label">Sort Order</label>
+                      <input type="number" name="sort_order" class="form-control form-control-sm" value="{{ image.sort_order }}">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label">Variant</label>
+                      <select name="variant_id" class="form-select form-select-sm">
+                        <option value="">— Product Level —</option>
+                        {% for variant in product.variants %}
+                        <option value="{{ variant.id }}" {% if image.variant_id == variant.id %}selected{% endif %}>{{ variant.sku }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-12">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="is_primary" id="primary_{{ image.id }}" value="on" {% if image.is_primary %}checked{% endif %}>
+                        <label class="form-check-label" for="primary_{{ image.id }}">Primary image</label>
+                      </div>
+                    </div>
+                    <div class="col-12 small text-muted">Path: {{ image.path }}</div>
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                    </div>
+                  </div>
+                </form>
+                <form method="post" action="/images/{{ image.id }}/delete">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12 text-muted">No images uploaded.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

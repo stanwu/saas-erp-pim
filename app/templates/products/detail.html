@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — ERP PIM{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{{ product.name }} <span class="badge bg-secondary">{{ product.sku }}</span></h4>
+  <div>
+    {% if current_user.role.value == 'admin' %}
+    <a href="/products/{{ product.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+    <a href="/images/products/{{ product.id }}" class="btn btn-sm btn-outline-secondary ms-1">Images</a>
+    <a href="/channels/{{ product.id }}/listings" class="btn btn-sm btn-outline-secondary ms-1">Listings</a>
+    {% endif %}
+    <a href="/products" class="btn btn-sm btn-outline-secondary ms-1">← Back</a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Images</span>
+    {% if current_user.role.value == 'admin' %}
+    <a href="/images/products/{{ product.id }}" class="btn btn-sm btn-outline-secondary">Manage Images</a>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      {% for image in product.images | sort(attribute='sort_order') %}
+      <div class="col-md-3">
+        <div class="card h-100">
+          <img src="{{ image.path }}" alt="{{ image.alt_text or product.name }}" class="card-img-top">
+          <div class="card-body p-2">
+            <div class="small">{{ image.alt_text or "No alt text" }}</div>
+            <div class="small text-muted">Sort {{ image.sort_order }}{% if image.is_primary %} • Primary{% endif %}</div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="col-12 text-muted">No images uploaded.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Product Info</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Category</dt><dd class="col-7">{{ product.category.name if product.category else "—" }}</dd>
+          <dt class="col-5">Brand</dt><dd class="col-7">{{ product.brand.name if product.brand else "—" }}</dd>
+          <dt class="col-5">Supplier</dt><dd class="col-7">{{ product.supplier.name if product.supplier else "—" }}</dd>
+          <dt class="col-5">Unit</dt><dd class="col-7">{{ product.unit }}</dd>
+          <dt class="col-5">Cost Price</dt><dd class="col-7">${{ "%.2f" | format(product.cost_price | float) }}</dd>
+          <dt class="col-5">Sale Price</dt><dd class="col-7">${{ "%.2f" | format(product.sale_price | float) }}</dd>
+          <dt class="col-5">Reorder Point</dt><dd class="col-7">{{ product.reorder_point }}</dd>
+          <dt class="col-5">Lifecycle</dt><dd class="col-7"><span class="badge {% if product.status.value == 'active' %}bg-success{% elif product.status.value == 'draft' %}bg-secondary{% else %}bg-dark{% endif %}">{{ product.status.value }}</span></dd>
+          <dt class="col-5">Status</dt><dd class="col-7">{% if product.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</dd>
+          <dt class="col-5">Created</dt><dd class="col-7 small">{{ product.created_at.strftime("%Y-%m-%d") }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Content and SEO</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Short Description</dt><dd class="col-7">{{ product.short_description or "—" }}</dd>
+          <dt class="col-5">Barcode</dt><dd class="col-7">{{ product.barcode or "—" }}</dd>
+          <dt class="col-5">SEO Title</dt><dd class="col-7">{{ product.seo_title or "—" }}</dd>
+          <dt class="col-5">SEO Keywords</dt><dd class="col-7">{{ product.seo_keywords or "—" }}</dd>
+          <dt class="col-5">Dimensions</dt><dd class="col-7">{{ product.length }} × {{ product.width }} × {{ product.height }}</dd>
+          <dt class="col-5">Weight</dt><dd class="col-7">{{ product.weight }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">Description</div>
+  <div class="card-body">
+    {{ product.description or "No description." }}
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">Attribute Values</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      {% for value in product.attribute_values %}
+      <dt class="col-sm-4">{{ value.attribute.name if value.attribute else value.attribute_id }}</dt>
+      <dd class="col-sm-8">{{ value.value }}</dd>
+      {% else %}
+      <dd class="col-12 text-muted mb-0">No attribute values.</dd>
+      {% endfor %}
+    </dl>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Tags</div>
+  <div class="card-body">
+    {% for tag in product.tags %}
+    <span class="badge text-bg-secondary me-1">{{ tag.name }}</span>
+    {% else %}
+    <span class="text-muted">No tags.</span>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Channel Listings</span>
+    <a href="/channels/{{ product.id }}/listings" class="btn btn-sm btn-outline-secondary">Manage Listings</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead class="table-light"><tr><th>Channel</th><th>Status</th><th>External ID</th><th>URL</th><th>Sync</th></tr></thead>
+      <tbody>
+        {% for listing in product.channel_listings %}
+        <tr>
+          <td>{{ listing.channel.name if listing.channel else listing.channel_id }}</td>
+          <td><span class="badge {% if listing.listing_status.value == 'published' %}bg-success{% elif listing.listing_status.value == 'paused' %}bg-warning text-dark{% elif listing.listing_status.value == 'error' %}bg-danger{% else %}bg-secondary{% endif %}">{{ listing.listing_status.value }}</span></td>
+          <td class="small">{{ listing.external_product_id or "—" }}</td>
+          <td class="small">{% if listing.external_url %}<a href="{{ listing.external_url }}" target="_blank" rel="noreferrer">Open</a>{% else %}—{% endif %}</td>
+          <td>{% if listing.sync_enabled %}<span class="badge bg-success">Enabled</span>{% else %}<span class="badge bg-secondary">Disabled</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-3">No channel listings yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Variants</span>
+    <a href="/variants/new?product_id={{ product.id }}" class="btn btn-sm btn-outline-secondary">Manage Variants</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead class="table-light"><tr><th>SKU</th><th>Name</th><th>Barcode</th><th>Price Adjustment</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for variant in product.variants %}
+        <tr>
+          <td>{{ variant.sku }}</td>
+          <td>{{ variant.name }}{% if variant.option_values %}<div class="small text-muted">{{ variant.option_values | map(attribute='option.value') | join(', ') }}</div>{% endif %}</td>
+          <td class="small">{{ variant.barcode or "—" }}</td>
+          <td>{{ variant.price_adjustment }}</td>
+          <td>{% if variant.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-3">No variants yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
