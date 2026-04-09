@@ -1,5 +1,7 @@
 # saas-erp-pim
 
+[![Status: WIP](https://img.shields.io/badge/status-WIP-orange)](https://github.com/stanwu/saas-erp-pim)
+
 > **Product Information Management (PIM)** — a FastAPI-based SaaS ERP module for managing rich product data, designed as a companion to [saas-erp-ims](https://github.com/stanwu/saas-erp-ims) with full schema compatibility for cross-system integration.
 >
 > **Status:** Under active development (WIP). Core PIM workflows are implemented, while live marketplace publishing is still in progress.
