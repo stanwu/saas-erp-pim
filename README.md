@@ -277,6 +277,13 @@ Still intentionally incomplete:
 
 ---
 
+## Contributors
+
+- [stanwu](https://github.com/stanwu) - product direction, architecture, and implementation
+- Codex - AI coding assistance for implementation, refactoring, testing, and documentation updates
+
+---
+
 ## License
 
 [MIT](LICENSE)
