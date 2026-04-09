@@ -3,6 +3,7 @@
 [![Download Release](https://img.shields.io/badge/Download-Latest%20Release-0ea5e9)](https://github.com/stanwu/saas-erp-pim/releases/latest)
 [![GitHub Release](https://img.shields.io/github/v/release/stanwu/saas-erp-pim)](https://github.com/stanwu/saas-erp-pim/releases/latest)
 [![Demo Data Included](https://img.shields.io/badge/Demo%20Data-Included-16a34a)](https://github.com/stanwu/saas-erp-pim/releases/latest)
+[![Ready to Try](https://img.shields.io/badge/Ready%20to%20Try-Zip%20Includes%20Sample%20Data-f59e0b)](https://github.com/stanwu/saas-erp-pim/releases/latest)
 
 A lightweight product information management system built with **FastAPI + SQLite**. It manages product master data such as descriptions, specifications, attributes, variants, images, SEO fields, and marketplace listing metadata, and is designed to work alongside [saas-erp-ims](https://github.com/stanwu/saas-erp-ims).
 
