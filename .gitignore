@@ -14,3 +14,4 @@ app/static/uploads/
 scripts/screenshot.py
 build/
 dist/
+plan.md
