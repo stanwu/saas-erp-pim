@@ -1,5 +1,7 @@
 # ERP PIM - Product Information Management SaaS
 
+[Download Latest Release ZIP](https://github.com/stanwu/saas-erp-pim/releases/latest)
+
 [![Download Release](https://img.shields.io/badge/Download-Latest%20Release-0ea5e9)](https://github.com/stanwu/saas-erp-pim/releases/latest)
 [![GitHub Release](https://img.shields.io/github/v/release/stanwu/saas-erp-pim)](https://github.com/stanwu/saas-erp-pim/releases/latest)
 [![Demo Data Included](https://img.shields.io/badge/Demo%20Data-Included-16a34a)](https://github.com/stanwu/saas-erp-pim/releases/latest)
