@@ -42,7 +42,7 @@ ERP_PIM_ENV=development
 ERP_PIM_UPLOAD_DIR=app/static/uploads
 ERP_PIM_MAX_UPLOAD_MB=5
 """
-    quick_start = """# ERP PIM Release Bundle
+    quick_start = """# Stanis PIM Release Bundle
 
 This package includes a seeded `erp_pim.db` so the first run already contains demo products,
 attributes, variants, images, and channel setup examples.

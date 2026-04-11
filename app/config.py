@@ -17,7 +17,7 @@ INSECURE_CSRF_SECRETS = {
 
 class Settings:
     def __init__(self) -> None:
-        self.app_name = "ERP PIM"
+        self.app_name = "Stanis PIM"
         self.secret_key = os.getenv("ERP_PIM_SECRET_KEY", "dev-secret-key-change-in-prod")
         self.csrf_secret = os.getenv("ERP_PIM_CSRF_SECRET", "csrf-secret-change-in-prod")
         self.environment = os.getenv("ERP_PIM_ENV", "development").strip().lower()

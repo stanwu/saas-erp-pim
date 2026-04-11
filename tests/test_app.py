@@ -43,7 +43,7 @@ def test_login_page_loads():
     with TestClient(app) as client:
         response = client.get("/login")
         assert response.status_code == 200
-        assert "ERP PIM" in response.text
+        assert "Stanis PIM" in response.text
 
 
 def test_dashboard_requires_login():

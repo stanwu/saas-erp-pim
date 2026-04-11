@@ -1,4 +1,4 @@
-# ERP PIM - Product Information Management SaaS
+# Stanis PIM - Product Information Management SaaS
 
 [Download Latest Release ZIP](https://github.com/stanwu/saas-erp-pim/releases/latest)
 
